@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RorkStyleDevEnvironment from './RorkStyleDevEnvironment';
+import CleanRorkEnvironment from './CleanRorkEnvironment';
 
 export default function SimpleEmergentHome() {
   const [currentView, setCurrentView] = useState('home');
@@ -29,7 +29,7 @@ export default function SimpleEmergentHome() {
 
   if (currentView === 'dev' && currentApp) {
     return (
-      <RorkStyleDevEnvironment 
+      <CleanRorkEnvironment 
         appId={currentApp.id}
         appDescription={currentApp.description}
         onBack={handleBackToHome}

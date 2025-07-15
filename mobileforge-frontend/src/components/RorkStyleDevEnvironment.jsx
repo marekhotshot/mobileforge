@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { containerApi } from '../services/containerApi';
+import SimpleCodeTab from './SimpleCodeTab';
 import { 
   PlayIcon, 
   StopIcon, 
@@ -339,10 +340,18 @@ The changes have been applied to your development environment. Check the preview
         </div>
       </div>
 
-      {/* Main Content - Three Panel Layout */}
-      <div className="flex-1 flex">
-        {/* Left Panel - Chat */}
-        <div className="w-1/3 border-r border-gray-800 flex flex-col">
+      {/* Main Content */}
+      <div className="flex-1">
+        {activeTab === 'code' ? (
+          <SimpleCodeTab 
+            appId={appId}
+            containerStatus={containerStatus}
+            isContainerRunning={isContainerRunning}
+          />
+        ) : (
+          <div className="flex h-full">
+            {/* Left Panel - Chat */}
+            <div className="w-1/3 border-r border-gray-800 flex flex-col">
           {/* Chat Header */}
           <div className="p-4 border-b border-gray-800">
             <div className="flex items-center space-x-2 mb-2">
@@ -506,6 +515,7 @@ The changes have been applied to your development environment. Check the preview
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
