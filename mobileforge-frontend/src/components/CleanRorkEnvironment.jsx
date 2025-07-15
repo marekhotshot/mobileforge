@@ -79,13 +79,21 @@ const CleanRorkEnvironment = ({ appId, appDescription, onBack }) => {
             <div className="flex bg-gray-800 rounded-lg">
               <button 
                 onClick={() => setActiveTab('code')}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-l-lg"
+                className={`px-4 py-2 text-sm rounded-l-lg ${
+                  activeTab === 'code' 
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
               >
                 Code
               </button>
               <button 
                 onClick={() => setActiveTab('preview')}
-                className="px-4 py-2 text-sm bg-gray-700 text-white rounded-r-lg"
+                className={`px-4 py-2 text-sm rounded-r-lg ${
+                  activeTab === 'preview' 
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
               >
                 Preview
               </button>

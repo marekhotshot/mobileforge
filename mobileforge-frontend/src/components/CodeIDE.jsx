@@ -10,7 +10,7 @@ import {
   ChevronRightIcon,
   ChevronDownIcon,
   CodeBracketIcon,
-  TerminalIcon,
+  CommandLineIcon,
   DocumentTextIcon,
   CogIcon
 } from '@heroicons/react/24/outline';
@@ -348,7 +348,7 @@ export default PhotoEditor;`
         <div className="w-80 bg-gray-900 border-l border-gray-700 flex flex-col">
           <div className="px-3 py-2 bg-gray-800 border-b border-gray-700">
             <h3 className="text-sm font-medium text-gray-300 flex items-center">
-              <TerminalIcon className="w-4 h-4 mr-2" />
+              <CommandLineIcon className="w-4 h-4 mr-2" />
               Terminal
             </h3>
           </div>
