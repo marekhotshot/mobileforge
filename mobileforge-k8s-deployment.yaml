@@ -1,0 +1,252 @@
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mobileforge
+  labels:
+    app: mobileforge
+
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mobileforge-frontend
+  namespace: mobileforge
+  labels:
+    app: mobileforge-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mobileforge-frontend
+  template:
+    metadata:
+      labels:
+        app: mobileforge-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: frontend-build
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: frontend-build
+        configMap:
+          name: mobileforge-frontend-build
+      - name: nginx-config
+        configMap:
+          name: mobileforge-nginx-config
+
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mobileforge-backend
+  namespace: mobileforge
+  labels:
+    app: mobileforge-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mobileforge-backend
+  template:
+    metadata:
+      labels:
+        app: mobileforge-backend
+    spec:
+      containers:
+      - name: backend
+        image: python:3.11-slim
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        - name: FLASK_APP
+          value: "src/main.py"
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mobileforge-secrets
+              key: openai-api-key
+        command: ["/bin/sh"]
+        args: ["-c", "pip install -r requirements.txt && python src/main.py"]
+        volumeMounts:
+        - name: backend-code
+          mountPath: /app
+        workingDir: /app
+      volumes:
+      - name: backend-code
+        configMap:
+          name: mobileforge-backend-code
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mobileforge-frontend-service
+  namespace: mobileforge
+  labels:
+    app: mobileforge-frontend
+spec:
+  selector:
+    app: mobileforge-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  type: ClusterIP
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mobileforge-backend-service
+  namespace: mobileforge
+  labels:
+    app: mobileforge-backend
+spec:
+  selector:
+    app: mobileforge-backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+  type: ClusterIP
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mobileforge-ingress
+  namespace: mobileforge
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - mobileforge.yourdomain.com
+    secretName: mobileforge-tls
+  rules:
+  - host: mobileforge.yourdomain.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: mobileforge-backend-service
+            port:
+              number: 5000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mobileforge-frontend-service
+            port:
+              number: 80
+
+---
+# Secrets (template - replace with actual values)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mobileforge-secrets
+  namespace: mobileforge
+type: Opaque
+data:
+  openai-api-key: <base64-encoded-openai-api-key>
+
+---
+# Nginx Config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mobileforge-nginx-config
+  namespace: mobileforge
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        root /usr/share/nginx/html;
+        index index.html;
+        
+        # Handle React Router
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+        
+        # API proxy
+        location /api {
+            proxy_pass http://mobileforge-backend-service:5000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Enable gzip compression
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    }
+
+---
+# HorizontalPodAutoscaler for Frontend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mobileforge-frontend-hpa
+  namespace: mobileforge
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mobileforge-frontend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+---
+# HorizontalPodAutoscaler for Backend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mobileforge-backend-hpa
+  namespace: mobileforge
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mobileforge-backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
