@@ -10,6 +10,7 @@ from src.routes.user import user_bp
 from src.routes.llm import llm_bp
 from src.routes.apps import apps_bp
 from src.routes.codegen import codegen_bp
+from src.routes.containers import containers_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
@@ -22,6 +23,7 @@ app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(llm_bp, url_prefix='/api/llm')
 app.register_blueprint(apps_bp, url_prefix='/api/apps')
 app.register_blueprint(codegen_bp, url_prefix='/api/codegen')
+app.register_blueprint(containers_bp)
 
 # uncomment if you need to use database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"

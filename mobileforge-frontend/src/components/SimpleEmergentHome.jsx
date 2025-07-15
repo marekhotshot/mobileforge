@@ -1,7 +1,41 @@
 import React, { useState } from 'react';
+import RorkStyleDevEnvironment from './RorkStyleDevEnvironment';
 
 export default function SimpleEmergentHome() {
+  const [currentView, setCurrentView] = useState('home');
+  const [currentApp, setCurrentApp] = useState(null);
   const [inputValue, setInputValue] = useState('');
+
+  const handleStartBuilding = (description) => {
+    const appId = `app-${Date.now()}`;
+    setCurrentApp({
+      id: appId,
+      description: description,
+      createdAt: new Date()
+    });
+    setCurrentView('dev');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView('home');
+    setCurrentApp(null);
+  };
+
+  const handleSubmitInput = () => {
+    if (inputValue.trim()) {
+      handleStartBuilding(inputValue);
+    }
+  };
+
+  if (currentView === 'dev' && currentApp) {
+    return (
+      <RorkStyleDevEnvironment 
+        appId={currentApp.id}
+        appDescription={currentApp.description}
+        onBack={handleBackToHome}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -18,66 +52,73 @@ export default function SimpleEmergentHome() {
           <div className="flex items-center space-x-2 bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-lg">
             <span className="text-sm font-medium">10.00</span>
           </div>
-          <button className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-medium hover:bg-yellow-400 transition-colors">
+          <button className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-medium transition-colors">
             Buy Credits
           </button>
           <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium">M</span>
+            <span className="text-white font-bold text-sm">M</span>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        {/* Welcome Section */}
+      <main className="flex flex-col items-center justify-center min-h-[80vh] px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-light text-gray-300 mb-2">
+          <h1 className="text-4xl md:text-5xl font-light text-gray-300 mb-4">
             Welcome, Marek
           </h1>
-          <h2 className="text-4xl font-light">
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              What will you build today?
-            </span>
+          <h2 className="text-3xl md:text-4xl font-light bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            What will you build today?
           </h2>
         </div>
 
-        {/* Input Section */}
-        <div className="mb-8">
-          <div className="relative bg-gray-900/50 border border-gray-700 rounded-2xl p-6 backdrop-blur-sm">
+        {/* Input Area */}
+        <div className="w-full max-w-4xl mb-8">
+          <div className="relative">
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Build me a beautiful mobile app for..."
-              className="w-full bg-transparent text-white placeholder-gray-400 resize-none outline-none text-lg leading-relaxed min-h-[100px]"
-              rows={4}
+              className="w-full h-32 bg-gray-900 border-2 border-gray-700 rounded-xl px-6 py-4 text-white placeholder-gray-400 resize-none focus:outline-none focus:border-blue-500 transition-colors"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                  handleSubmitInput();
+                }
+              }}
             />
             
             {/* Bottom Controls */}
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
+            <div className="flex items-center justify-between mt-4 px-2">
               <div className="flex items-center space-x-4">
-                <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                  +
+                <button className="flex items-center space-x-2 bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg transition-colors">
+                  <span>📎</span>
+                  <span className="text-sm">Attach</span>
                 </button>
                 
-                <div className="flex items-center space-x-2">
-                  <button className="flex items-center space-x-2 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm hover:bg-gray-700 transition-colors">
-                    <span>Select Repo</span>
-                    <span className="text-gray-400">▼</span>
-                  </button>
-                  
-                  <button className="flex items-center space-x-2 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm hover:bg-gray-700 transition-colors">
-                    <span>E-11</span>
-                    <span className="text-gray-400">▼</span>
-                  </button>
-                </div>
+                <button className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors">
+                  <span className="text-sm">Select Repo</span>
+                  <span>▼</span>
+                  <span className="bg-purple-800 text-xs px-2 py-1 rounded">4</span>
+                </button>
+                
+                <button className="flex items-center space-x-2 bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg transition-colors">
+                  <span className="text-sm">E-11</span>
+                  <span>▼</span>
+                  <span className="bg-teal-800 text-xs px-2 py-1 rounded">5</span>
+                </button>
               </div>
               
               <div className="flex items-center space-x-2">
                 <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                  ⚙️
+                  <span className="text-lg">⚙️</span>
                 </button>
-                <button className="bg-white text-black p-2 rounded-lg hover:bg-gray-200 transition-colors">
-                  →
+                
+                <button 
+                  onClick={handleSubmitInput}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white p-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!inputValue.trim()}
+                >
+                  <span className="text-lg">→</span>
                 </button>
               </div>
             </div>
@@ -85,105 +126,85 @@ export default function SimpleEmergentHome() {
         </div>
 
         {/* Suggestion Buttons */}
-        <div className="flex flex-wrap gap-3 justify-center mb-12">
-          <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border bg-green-500/10 text-green-400 border-green-500/20 transition-all hover:scale-105">
-            <span>📱</span>
-            <span className="text-sm font-medium">Mobile App</span>
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <button 
+            onClick={() => handleStartBuilding("Create a modern mobile fitness app with AI personal trainer, workout tracking, and social features")}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105"
+          >
+            📱 Mobile App
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border bg-blue-500/10 text-blue-400 border-blue-500/20 transition-all hover:scale-105">
-            <span>🌐</span>
-            <span className="text-sm font-medium">Web App</span>
+          <button 
+            onClick={() => handleStartBuilding("Build a responsive web application with modern UI/UX and real-time features")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105"
+          >
+            🌐 Web App
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border bg-purple-500/10 text-purple-400 border-purple-500/20 transition-all hover:scale-105">
-            <span>🚀</span>
-            <span className="text-sm font-medium">Landing Page</span>
+          <button 
+            onClick={() => handleStartBuilding("Design a stunning landing page with animations and conversion optimization")}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105"
+          >
+            🚀 Landing Page
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border bg-pink-500/10 text-pink-400 border-pink-500/20 transition-all hover:scale-105">
-            <span>✨</span>
-            <span className="text-sm font-medium">Surprise Me</span>
-          </button>
-          <button className="p-2 text-gray-400 hover:text-white transition-colors">
-            🔄
+          <button 
+            onClick={() => handleStartBuilding("Surprise me with an innovative app idea using cutting-edge technology")}
+            className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105"
+          >
+            ✨ Surprise Me
           </button>
         </div>
 
-        {/* Tasks Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Tasks */}
-          <div>
-            <div className="flex items-center space-x-4 mb-6">
-              <button className="flex items-center space-x-2 text-white font-medium">
-                <span>📋</span>
-                <span>Recent Tasks</span>
-              </button>
-              <button className="text-gray-400 hover:text-white transition-colors">
-                <span>Deployed Apps</span>
-              </button>
-              <button className="ml-auto p-1 text-gray-400 hover:text-white transition-colors">
-                🔄
-              </button>
-            </div>
-            
-            <div className="bg-gray-900/30 border border-gray-800 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-3 gap-4 p-4 border-b border-gray-800 text-sm text-gray-400">
-                <span>ID</span>
-                <span className="col-span-2">Task</span>
-              </div>
-              
-              <div className="p-8 text-center">
-                <p className="text-gray-400 mb-2">No tasks yet</p>
-                <p className="text-sm text-gray-500">Click the plus button at the top to create your first task and start building</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Deployed Apps */}
-          <div>
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-300 mb-4">Deployed Apps</h3>
-            </div>
-            
-            <div className="bg-gray-900/30 border border-gray-800 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-800 text-sm text-gray-400">
-                <span>ID</span>
-                <span>Name</span>
-                <span>Status</span>
-                <span>Users</span>
-              </div>
-              
-              <div className="p-8 text-center">
-                <p className="text-gray-400 mb-2">No apps deployed yet</p>
-                <p className="text-sm text-gray-500">Start building to see your deployed applications here</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Community Section */}
-        <div className="mt-16 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-8">
-            <span className="text-gray-500">• • • • • • •</span>
-            <span className="text-gray-400 font-medium">From the Community</span>
-            <span className="text-gray-500">• • • • • • •</span>
-          </div>
-          
-          <div className="flex flex-wrap gap-4 justify-center">
-            <button className="flex items-center space-x-2 bg-white text-black px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-              <span>✨</span>
-              <span>AI Apps</span>
+        {/* Bottom Section */}
+        <div className="w-full max-w-6xl">
+          {/* Tab Navigation */}
+          <div className="flex items-center space-x-8 mb-6">
+            <button className="flex items-center space-x-2 text-white border-b-2 border-white pb-2">
+              <span>📋</span>
+              <span>Recent Tasks</span>
             </button>
-            <button className="flex items-center space-x-2 bg-gray-800 border border-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors">
-              <span>💻</span>
-              <span>Digital Sidekicks</span>
-            </button>
-            <button className="flex items-center space-x-2 bg-gray-800 border border-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors">
-              <span>🌐</span>
-              <span>Landing</span>
-            </button>
-            <button className="flex items-center space-x-2 bg-gray-800 border border-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors">
+            <button className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
               <span>🚀</span>
-              <span>Hack & Play</span>
+              <span>Deployed Apps</span>
             </button>
+            <button className="ml-auto text-gray-400 hover:text-white transition-colors">
+              🔄
+            </button>
+          </div>
+
+          {/* Tasks Table */}
+          <div className="bg-gray-900 rounded-xl border border-gray-800">
+            <div className="grid grid-cols-2 gap-4 p-4 border-b border-gray-800 text-gray-400 text-sm">
+              <div>ID</div>
+              <div>Task</div>
+            </div>
+            
+            <div className="p-8 text-center text-gray-500">
+              <p>No tasks yet</p>
+              <p className="text-sm mt-2">Click the plus button at the top to create your first task and start building</p>
+            </div>
+          </div>
+
+          {/* Community Section */}
+          <div className="text-center mt-12 mb-8">
+            <div className="flex items-center justify-center space-x-2 text-gray-400 mb-6">
+              <span>• • • • • •</span>
+              <span className="text-white">From the Community</span>
+              <span>• • • • • •</span>
+            </div>
+            
+            <div className="flex flex-wrap justify-center gap-4">
+              <button className="bg-white text-black px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-colors">
+                🤖 AI Apps
+              </button>
+              <button className="bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-gray-700 transition-colors">
+                📱 Digital Sidekicks
+              </button>
+              <button className="bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-gray-700 transition-colors">
+                📄 Landing
+              </button>
+              <button className="bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-gray-700 transition-colors">
+                🎮 Hack & Play
+              </button>
+            </div>
           </div>
         </div>
       </main>
