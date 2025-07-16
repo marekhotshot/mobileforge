@@ -21,20 +21,28 @@ const CleanRorkEnvironment = ({ appId, appDescription, onBack }) => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex bg-gray-800 rounded-lg">
-                <button 
-                  onClick={() => setActiveTab('code')}
-                  className="px-4 py-2 text-sm bg-gray-700 text-white rounded-l-lg"
-                >
-                  Code
-                </button>
-                <button 
-                  onClick={() => setActiveTab('preview')}
-                  className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-r-lg"
-                >
-                  Preview
-                </button>
-              </div>
+            <div className="flex bg-gray-800 rounded-lg">
+              <button 
+                onClick={() => setActiveTab('code')}
+                className={`px-4 py-2 text-sm rounded-l-lg ${
+                  activeTab === 'code' 
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Code
+              </button>
+              <button 
+                onClick={() => setActiveTab('preview')}
+                className={`px-4 py-2 text-sm rounded-r-lg ${
+                  activeTab === 'preview' 
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Preview
+              </button>
+            </div>
 
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
@@ -112,30 +120,42 @@ const CleanRorkEnvironment = ({ appId, appDescription, onBack }) => {
       </div>
 
       {/* Three Panel Layout */}
-      <div className="flex-1 flex">
-        {/* Left Panel - Chat */}
-        <div className="w-1/3 border-r border-gray-800 flex flex-col">
+      <div className="flex flex-1 h-full">
+        {/* Left Panel - Chat Interface */}
+        <div className="w-1/3 bg-gray-900 border-r border-gray-800 flex flex-col">
+          {/* Chat Header */}
           <div className="p-4 border-b border-gray-800">
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 bg-white rounded-full"></div>
-              <span className="font-medium">Rork</span>
+              <span className="text-white font-medium">MobileForge</span>
             </div>
-            <div className="text-sm text-gray-400 mb-3">
-              {appDescription}
-            </div>
+            <p className="text-gray-400 text-sm">{appDescription}</p>
           </div>
-
+          
+          {/* Chat Content */}
           <div className="flex-1 p-4">
             <div className="text-gray-300 text-sm">
-              I'll create a beautiful AI camera app that enhances photos using AI. The app will have these key features:
+              I'll create a beautiful mobile app using React Native. The app will have these key features:
               <br/><br/>
-              1. Camera interface to take photos<br/>
-              2. AI enhancement capabilities using the AI endpoints provided<br/>
-              3. Gallery to view enhanced photos<br/>
-              4. Settings for customization
+              1. Modern mobile interface design<br/>
+              2. Cross-platform compatibility (iOS & Android)<br/>
+              3. Real-time functionality and state management<br/>
+              4. Professional UI/UX following mobile best practices
             </div>
+            
+            {/* Expandable Thoughts Section */}
+            <details className="mt-4">
+              <summary className="text-gray-400 cursor-pointer hover:text-white">
+                💭 Thoughts
+              </summary>
+              <div className="mt-2 text-gray-400 text-xs">
+                The user wants to build a mobile app. I need to create a React Native project with proper navigation, 
+                state management, and mobile-optimized components. I'll focus on creating a clean, modern interface 
+                that works well on both iOS and Android platforms.
+              </div>
+            </details>
           </div>
-
+          
           <div className="p-4 border-t border-gray-800">
             <input 
               type="text" 
